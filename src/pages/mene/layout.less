@@ -1,0 +1,172 @@
+.man {
+  display: flex;
+  flex-direction: row;
+}
+
+.mone {
+  height: calc(100vh - 4rem);
+  background: rgb(@primary-r + 10, @primary-g + 100, @primary-b - 55);
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  z-index: 3;
+}
+
+.moneUp:extend(.mone) {
+  width: 4rem;
+  transition: 0.5s;
+}
+
+.moneUp > span {
+  font-size: 2rem;
+  margin: 2.5px 0;
+  padding: 7px 5px;
+  color: #efefef;
+  transition: 0.5s;
+}
+
+.moneUp > span:hover {
+  cursor: pointer;
+}
+
+.moneDel:extend(.mone) {
+  width: 8rem;
+  transition: 0.5s;
+}
+
+.moneDel > span {
+  font-size: 1.5rem;
+  margin: 2.5px 10px;
+  padding: 7px 5px;
+  color: #efefef;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 4px;
+  transition: 0.5s;
+}
+
+.moneDel > span:hover {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.192);
+}
+
+.moneDel > span > div {
+  font-size: 1rem;
+  text-align: center;
+  height: 26px;
+  transition: 0.5s;
+  width: 5rem;
+  animation: text 0.5s ease-in;
+  overflow: hidden;
+}
+.moneDel > span > span {
+  margin-left: 7px;
+}
+
+.content {
+  height: calc(100vh - 4rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.to {
+  margin-top: 1rem;
+  color: #efefef;
+  position: absolute;
+  bottom: 1rem;
+  font-size: 2rem;
+}
+
+.toUp:extend(.to) {
+  width: 4rem;
+  text-align: center;
+  transition: 0.5s;
+}
+
+.toUp:hover {
+  cursor: pointer;
+}
+
+.toDel:extend(.to) {
+  text-align: right;
+  padding-right: 1rem;
+  width: 8rem;
+  transition: 0.5s;
+}
+
+.toDel:hover {
+  cursor: pointer;
+}
+
+@keyframes text {
+  0% {
+    color: transparent;
+    position: relative;
+    left: -8rem;
+  }
+  100% {
+    color: #efeffe;
+    position: relative;
+    left: -0rem;
+  }
+}
+
+.toMent {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  z-index: 2;
+  padding: 10px 0;
+}
+
+.toMentUp:extend(.toMent) {
+  width: 8rem;
+  position: relative;
+  left: 0rem;
+  background: rgb(@primary-r + 80, @primary-g + 155, @primary-b);
+  transition: 0.5s;
+}
+
+.toText {
+  overflow: hidden;
+  font-size: 1rem;
+  margin: 2.5px 10px;
+  text-align: center;
+  padding: 2.5px 10px;
+}
+
+.toMentUp > div:extend(.toText) {
+  color: #efefef;
+  border-radius: 4px;
+  transition: 0.5s;
+}
+
+.toMentUp > div:hover {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.192);
+  transition: 0.5s;
+}
+
+.toMentText {
+  background: rgba(255, 255, 255, 0.192);
+}
+
+.toMentDel:extend(.toMent) {
+  width: 0rem;
+  position: relative;
+  left: -8rem;
+  background: rgb(@primary-r + 80, @primary-g + 155, @primary-b);
+  transition: 0.5s;
+}
+.toMentDel > div:extend(.toText) {
+  color: transparent;
+}
+
+.kinUp {
+  background: rgba(255, 255, 255, 0.192);
+}
+.kinDel {
+  background: rgba(255, 255, 255, 0.192);
+}

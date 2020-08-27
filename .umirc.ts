@@ -4,5 +4,9 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  routes: [{ path: '/', component: '@/pages/index' }],
+  theme: {
+    '@primary-r': '000',
+    '@primary-g': '000',
+    '@primary-b': '255',
+  },
 });

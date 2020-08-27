@@ -1,10 +1,9 @@
-import React from 'react';
-import styles from './index.less';
+import React, { FC, useEffect } from 'react';
 
-export default () => {
-  return (
-    <div>
-      <h1 className={styles.title}>Page index</h1>
-    </div>
-  );
+const Page: FC<any> = () => {
+  useEffect(() => {}, []);
+
+  return <div>bsb</div>;
 };
+
+export default Page;

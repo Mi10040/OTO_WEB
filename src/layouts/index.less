@@ -1,0 +1,47 @@
+.memo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4rem;
+  line-height: 4rem;
+  width: 100vw;
+  background: rgb(@primary-r + 10, @primary-g + 125, @primary-b);
+  display: flex;
+  flex-direction: row;
+}
+.children {
+  padding-top: 4rem;
+}
+
+.logoTite {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 2rem;
+  color: #fff;
+  font-size: 1.75rem;
+}
+
+.historycss {
+  display: flex;
+  flex-direction: row;
+}
+.historycss > * {
+  padding: 0 1rem;
+  color: #fff;
+  transition: 0.7s;
+}
+
+.historycss > *:hover::before {
+  content: ' > ';
+  transition: 0.7s;
+}
+
+.historycss > *:hover {
+  cursor: pointer;
+  padding-left: 1.5rem;
+  transition: 0.7s;
+}
+
+.porInfo {
+}
