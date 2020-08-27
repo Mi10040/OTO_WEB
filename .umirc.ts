@@ -9,4 +9,8 @@ export default defineConfig({
     '@primary-g': '000',
     '@primary-b': '255',
   },
+  dva: {
+    immer: true,
+    skipModelValidate: true,
+  },
 });
