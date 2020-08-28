@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useMemo, useCallback } from 'react';
 import { connect } from 'umi';
-import { Table, Button, Col, Row, Space } from 'antd';
+import { Table, Button, notification, Space } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import {
   AppstoreAddOutlined,
@@ -25,6 +25,14 @@ const Page: FC<PageProps> = props => {
   socket.on('getList', (data: Array<any>) => {
     console.log(data[0]);
     dispatch(setList({ datas: data }));
+  });
+
+  socket.on('pmToErr', (data: string) => {
+    console.log(data);
+    notification['error']({
+      message: 'PM2 Error',
+      description: `${data}`,
+    });
   });
 
   const getList = () => socket.emit('list');
@@ -148,7 +156,7 @@ const Page: FC<PageProps> = props => {
   return (
     <div>
       <PageCard title={'PM2'} extra={cardExtra}>
-        <Table dataSource={pm2List.list} columns={columns} rowKey={'pid'} />
+        <Table dataSource={pm2List.list} columns={columns} rowKey={'pm_id'} />
       </PageCard>
     </div>
   );
