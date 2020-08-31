@@ -7,7 +7,7 @@ type PropsTpye = {} & CardProps;
 const PageCard: FC<PropsTpye> = (props: any) => {
   const { children } = props;
   return (
-    <Card style={{ margin: '20px', width: '100%' }} {...props}>
+    <Card style={{ margin: '20px', width: 'calc(100% - 40px)' }} {...props}>
       {children}
     </Card>
   );
