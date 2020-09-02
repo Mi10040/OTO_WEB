@@ -1,38 +1,117 @@
-import React, { FC, useEffect } from 'react';
-import { Table, Space, Upload, message, Card, Row, Col } from 'antd';
+import React, { FC, useEffect, useMemo, useState } from 'react';
+import {
+  Table,
+  Space,
+  message,
+  Card,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Select,
+  Spin,
+} from 'antd';
+import { ColumnsType } from 'antd/lib/table';
 import PageCard from '@/components/PageCard';
-import { InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 import io from 'socket.io-client';
+import { ModularListListState, setPackageList } from './model';
 import styles from './index.less';
+import { UmiComponentProps } from '@/types';
+import { connect } from 'umi';
+import debounce from 'lodash/debounce';
+import TextArea from 'antd/lib/input/TextArea';
+import Upload from '@/components/upload';
 
-const socket = io('http://192.168.0.103:8082/system');
-const { Dragger } = Upload;
+const { Option } = Select;
 
-const config = {
-  name: 'file',
-  multiple: true,
-  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+const socket = io('http://localhost:8082/system');
+const npms = io('http://localhost:8082/npm');
 
-const Page: FC<any> = props => {
+type PageProps = {
+  modularList: ModularListListState;
+} & UmiComponentProps;
+
+const Page: FC<PageProps> = props => {
+  const { dispatch, modularList } = props;
+  const [packageLoading, setPackageLoading] = useState(false);
+  const [packageCallModel, setPackageCallModel] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [npmList, setNpmList] = useState([]);
+  const [npmValue, setNpmValue] = useState([]);
+  const [npmCMD, setNpmCMD] = useState('');
+  const [npmCMDLoding, setNpmCMDLoding] = useState(false);
+
   useEffect(() => {
+    setPackageLoading(true);
     socket.emit('package');
   }, []);
 
-  socket.on('getPackage', data => {
-    console.log(data);
+  socket.on('getPackage', (data: JSON) => {
+    const datas = Object.entries(data).map((value: Array<string>) => {
+      return {
+        name: value[0],
+        version: value[1],
+      };
+    });
+    dispatch(setPackageList({ datas: datas }));
+    setPackageLoading(false);
   });
+
+  npms.on('installCmd', (data: ArrayBuffer) => {
+    setNpmCMDLoding(false);
+    const bl = new Blob([data]);
+    const fr = new FileReader();
+    fr.readAsText(bl, 'utf-8');
+    fr.onload = () => {
+      setNpmCMD(e => e + fr.result);
+    };
+  });
+
+  const packageCallModelFc = () => {
+    setPackageCallModel(v => !v);
+  };
+
+  const packageColumns: ColumnsType<any> = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '版本',
+      dataIndex: 'version',
+      key: 'version',
+    },
+  ];
+
+  const fetchUser = (value: string) => {
+    setNpmList([]);
+    setFetching(true);
+    npms.emit('suggestions', value);
+    npms.on('getSuggestions', (data: Array<any>) => {
+      setNpmList(JSON.parse([`${data}`].join()));
+      setFetching(false);
+    });
+  };
+
+  const NpmInstallCall = () => {
+    setNpmCMDLoding(true);
+    npms.emit('install', npmValue);
+  };
+
+  const handleChange = (value: any) => {
+    setNpmValue(value);
+    setFetching(false);
+  };
+
+  const cilckFile = (fileList: FileList) => {
+    console.log(fileList);
+  };
+
+  const dropFile = (fileList: FileList) => {
+    console.log(fileList);
+  };
 
   return (
     <>
@@ -44,8 +123,19 @@ const Page: FC<any> = props => {
             </PageCard>
           </Row>
           <Row>
-            <PageCard title={'依赖'}>
-              <Table />
+            <PageCard
+              title={'依赖'}
+              extra={<Button onClick={packageCallModelFc}>安装依赖</Button>}
+            >
+              <Table
+                dataSource={modularList.packageList}
+                columns={packageColumns}
+                rowKey={'name'}
+                loading={{
+                  spinning: packageLoading,
+                  delay: 500,
+                }}
+              />
             </PageCard>
           </Row>
         </Col>
@@ -56,30 +146,63 @@ const Page: FC<any> = props => {
               <InboxOutlined style={{ fontSize: '18px', color: '#1E90FF' }} />
             }
           >
-            <Dragger {...config}>
-              <div className={styles.bord}>
-                <p className="ant-upload-text">点击或拖拽上传</p>
-                <p className="ant-upload-hint">上传需要ZIP包并按照模块规则</p>
-                <p
-                  className="ant-upload-hint"
-                  style={{
-                    textAlign: 'left',
-                    margin: '10px',
-                  }}
-                >
-                  1:入口文件名称为app.js
-                  <br />
-                  2:使用CommonJS规范编写
-                  <br />
-                  3:使用非node原生模块前请查看模块服务依赖表
-                </p>
-              </div>
-            </Dragger>
+            <Upload
+              style={{ width: '100%', height: '300px' }}
+              cilckFileFc={cilckFile}
+              dropFileFc={dropFile}
+            ></Upload>
           </PageCard>
         </Col>
       </Row>
+      <Modal
+        title="装载依赖"
+        visible={packageCallModel}
+        maskClosable={false}
+        footer={null}
+        width={'60vw'}
+        onCancel={packageCallModelFc}
+      >
+        <Row>
+          <Col span={21}>
+            <Select
+              mode="multiple"
+              labelInValue
+              placeholder="NPM Pakcage 搜索"
+              notFoundContent={fetching ? <Spin size="small" /> : null}
+              filterOption={false}
+              value={npmValue}
+              onSearch={debounce(fetchUser, 800)}
+              onChange={handleChange}
+              style={{ width: '100%' }}
+            >
+              {npmList.map((value: { name: string }, index) => (
+                <Option value={value.name} key={index}>
+                  {value.name}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col span={1}>
+            <Button
+              icon={<AppstoreAddOutlined />}
+              loading={npmCMDLoding}
+              onClick={NpmInstallCall}
+            >
+              INSTALL
+            </Button>
+          </Col>
+        </Row>
+        <Spin spinning={npmCMDLoding}>
+          <TextArea
+            style={{ marginTop: '20px', width: '100%' }}
+            value={npmCMD}
+            disabled={true}
+            autoSize={{ minRows: 10, maxRows: 20 }}
+          />
+        </Spin>
+      </Modal>
     </>
   );
 };
 
-export default Page;
+export default connect(({ modularList }: PageProps) => ({ modularList }))(Page);

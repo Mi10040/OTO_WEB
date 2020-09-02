@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useCallback } from 'react';
+import React, { FC, useEffect, useMemo, useCallback, useState } from 'react';
 import { connect } from 'umi';
 import { Table, Button, notification, Space } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
@@ -14,7 +14,7 @@ import { UmiComponentProps } from '@/types';
 import PageCard from '@/components/PageCard';
 import styles from './index.less';
 
-const socket = io('http://192.168.0.103:8082/pm2');
+const socket = io('http://localhost:8082/pm2');
 
 type PageProps = {
   pm2List: Pm2ListState;
@@ -22,20 +22,23 @@ type PageProps = {
 
 const Page: FC<PageProps> = props => {
   const { pm2List, dispatch } = props;
+  const [loading, setLoading] = useState(false);
   socket.on('getList', (data: Array<any>) => {
-    console.log(data[0]);
     dispatch(setList({ datas: data }));
+    setLoading(false);
   });
 
   socket.on('pmToErr', (data: string) => {
-    console.log(data);
     notification['error']({
       message: 'PM2 Error',
       description: `${data}`,
     });
   });
 
-  const getList = () => socket.emit('list');
+  const getList = () => {
+    setLoading(true);
+    socket.emit('list');
+  };
 
   useEffect(() => {
     getList();
@@ -156,7 +159,15 @@ const Page: FC<PageProps> = props => {
   return (
     <div>
       <PageCard title={'PM2'} extra={cardExtra}>
-        <Table dataSource={pm2List.list} columns={columns} rowKey={'pm_id'} />
+        <Table
+          dataSource={pm2List.list}
+          columns={columns}
+          rowKey={'pm_id'}
+          loading={{
+            spinning: loading,
+            delay: 500,
+          }}
+        />
       </PageCard>
     </div>
   );

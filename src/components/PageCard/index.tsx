@@ -4,8 +4,7 @@ import { CardProps } from 'antd/lib/card';
 
 type PropsTpye = {} & CardProps;
 
-const PageCard: FC<PropsTpye> = (props: any) => {
-  const { children } = props;
+const PageCard: FC<PropsTpye> = ({ children, ...props }) => {
   return (
     <Card style={{ margin: '20px', width: 'calc(100% - 40px)' }} {...props}>
       {children}
