@@ -11,6 +11,8 @@ type PropsTpye = {
   HTMLDivElement
 >;
 
+const input: HTMLInputElement = document.createElement('input');
+
 const Upload: FC<PropsTpye> = ({
   children,
   dropFileFc,
@@ -28,13 +30,13 @@ const Upload: FC<PropsTpye> = ({
   };
 
   const cilck = () => {
-    const input: HTMLInputElement = document.createElement('input');
     input.type = 'file';
     input.accept = type;
     input.click();
     input.onchange = () => {
       if (input.files) {
         cilckFileFc(input.files);
+        input.value = '';
       }
     };
   };

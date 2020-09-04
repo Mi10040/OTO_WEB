@@ -22,6 +22,7 @@ import { connect } from 'umi';
 import debounce from 'lodash/debounce';
 import TextArea from 'antd/lib/input/TextArea';
 import Upload from '@/components/upload';
+import UploadProgress from '@/components/uploadProgress';
 
 const { Option } = Select;
 
@@ -41,6 +42,7 @@ const Page: FC<PageProps> = props => {
   const [npmValue, setNpmValue] = useState([]);
   const [npmCMD, setNpmCMD] = useState('');
   const [npmCMDLoding, setNpmCMDLoding] = useState(false);
+  const [upload, setUpload] = useState([]);
 
   useEffect(() => {
     setPackageLoading(true);
@@ -106,11 +108,15 @@ const Page: FC<PageProps> = props => {
   };
 
   const cilckFile = (fileList: FileList) => {
-    console.log(fileList);
+    setUpload(fileList as any);
   };
 
   const dropFile = (fileList: FileList) => {
-    console.log(fileList);
+    setUpload(fileList as any);
+  };
+
+  const load = (result: string | ArrayBuffer | null) => {
+    console.log(result);
   };
 
   return (
@@ -150,7 +156,13 @@ const Page: FC<PageProps> = props => {
               style={{ width: '100%', height: '300px' }}
               cilckFileFc={cilckFile}
               dropFileFc={dropFile}
-            ></Upload>
+            >
+              {[...upload].map((v: File, i: number) => {
+                return (
+                  <UploadProgress file={v} key={i} text={v.name} load={load} />
+                );
+              })}
+            </Upload>
           </PageCard>
         </Col>
       </Row>
