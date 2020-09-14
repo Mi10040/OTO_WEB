@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import PageCard from '@/components/PageCard';
-import { InboxOutlined, AppstoreAddOutlined } from '@ant-design/icons';
+import { UploadOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 import io from 'socket.io-client';
 import { ModularListListState, setPackageList } from './model';
 import styles from './index.less';
@@ -21,7 +21,7 @@ import { UmiComponentProps } from '@/types';
 import { connect } from 'umi';
 import debounce from 'lodash/debounce';
 import TextArea from 'antd/lib/input/TextArea';
-import Upload from '@/components/upload';
+import Upload from './component/upload';
 import UploadProgress from '@/components/uploadProgress';
 
 const { Option } = Select;
@@ -73,6 +73,9 @@ const Page: FC<PageProps> = props => {
   const packageCallModelFc = () => {
     setPackageCallModel(v => !v);
   };
+  const uploadModelFc = (on: Function) => {
+    on();
+  };
 
   const packageColumns: ColumnsType<any> = [
     {
@@ -107,11 +110,7 @@ const Page: FC<PageProps> = props => {
     setFetching(false);
   };
 
-  const cilckFile = (fileList: FileList) => {
-    setUpload(fileList as any);
-  };
-
-  const dropFile = (fileList: FileList) => {
+  const upFile = (fileList: FileList) => {
     setUpload(fileList as any);
   };
 
@@ -148,24 +147,19 @@ const Page: FC<PageProps> = props => {
         <Col span={8}>
           <PageCard
             title={'模块上传'}
-            extra={
-              <InboxOutlined style={{ fontSize: '18px', color: '#1E90FF' }} />
-            }
+            actions={[<UploadOutlined onClick={uploadModelFc} />]}
           >
-            <Upload
-              style={{ width: '100%', height: '300px' }}
-              cilckFileFc={cilckFile}
-              dropFileFc={dropFile}
-            >
+            <div style={{ width: '100%', height: '300px' }}>
               {[...upload].map((v: File, i: number) => {
                 return (
                   <UploadProgress file={v} key={i} text={v.name} load={load} />
                 );
               })}
-            </Upload>
+            </div>
           </PageCard>
         </Col>
       </Row>
+      <Upload val={uploadModelFc} />
       <Modal
         title="装载依赖"
         visible={packageCallModel}
@@ -173,6 +167,7 @@ const Page: FC<PageProps> = props => {
         footer={null}
         width={'60vw'}
         onCancel={packageCallModelFc}
+        destroyOnClose={true}
       >
         <Row>
           <Col span={21}>
