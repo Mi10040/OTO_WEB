@@ -28,6 +28,7 @@
     "axios": "^0.20.0",
     "dva-model-creator": "^0.4.3",
     "dva-model-extend": "^0.1.2",
+    "jszip": "^3.5.0",
     "lint-staged": "^10.0.7",
     "lodash": "^4.17.20",
     "prettier": "^1.19.1",
@@ -35,6 +36,7 @@
     "react-color": "^2.18.1",
     "react-dom": "^16.12.0",
     "socket.io-client": "^2.3.0",
+    "socket.io-stream": "^0.9.1",
     "umi": "^3.1.4",
     "uuid": "^8.0.0",
     "yorkie": "^2.0.0"

@@ -73,8 +73,8 @@ const Page: FC<PageProps> = props => {
   const packageCallModelFc = () => {
     setPackageCallModel(v => !v);
   };
-  const uploadModelFc = (on: Function) => {
-    on();
+  const uploadModelFc = data => {
+    setUpload([data]);
   };
 
   const packageColumns: ColumnsType<any> = [
@@ -147,19 +147,24 @@ const Page: FC<PageProps> = props => {
         <Col span={8}>
           <PageCard
             title={'模块上传'}
-            actions={[<UploadOutlined onClick={uploadModelFc} />]}
+            actions={[<Upload changes={uploadModelFc} />]}
           >
             <div style={{ width: '100%', height: '300px' }}>
-              {[...upload].map((v: File, i: number) => {
+              {upload.map((v: any, i: number) => {
                 return (
-                  <UploadProgress file={v} key={i} text={v.name} load={load} />
+                  <UploadProgress
+                    blob={v.upfile}
+                    key={i}
+                    text={v.name}
+                    load={load}
+                  />
                 );
               })}
             </div>
           </PageCard>
         </Col>
       </Row>
-      <Upload val={uploadModelFc} />
+
       <Modal
         title="装载依赖"
         visible={packageCallModel}

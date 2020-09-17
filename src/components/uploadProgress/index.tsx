@@ -1,16 +1,18 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Progress } from 'antd';
 import io from 'socket.io-client';
+//@ts-ignore
+import ss from 'socket.io-stream';
 
 const modules = io('http://localhost:8082/modules');
 
 type PropsTpye = {
   text: string;
-  file: File;
+  blob: Blob;
   load: (result: string | ArrayBuffer | null) => void;
 };
 
-const UploadProgress: FC<PropsTpye> = ({ text, file, load }) => {
+const UploadProgress: FC<PropsTpye> = ({ text, blob, load }) => {
   const [percent, setPercent] = useState(0);
   const [state, setState] = useState('active');
 
@@ -19,19 +21,20 @@ const UploadProgress: FC<PropsTpye> = ({ text, file, load }) => {
   });
 
   useEffect(() => {
-    const bl = new Blob([file]);
-    const fr = new FileReader();
-    fr.readAsArrayBuffer(bl);
-    fr.onprogress = e => {
-      setPercent(Math.ceil((e.loaded / e.total) * 100) / 2);
-    };
-    fr.onload = e => {
-      load(fr.result);
-      console.log(`${fr.result}`);
-      modules.emit('upload', fr.result);
-      // setState('success');
-    };
+    const stream = ss.createStream();
+    ss(modules).emit('file', stream, { size: blob.size });
+    const blobStream = ss.createBlobReadStream(blob);
+
+    let size = 0;
+    blobStream.on('data', function(chunk) {
+      size += chunk.length;
+      console.log(Math.floor((size / blob.size) * 100) + '%');
+      setPercent(Math.floor((size / blob.size) * 100));
+    });
+
+    blobStream.pipe(stream);
   }, []);
+
   return (
     <>
       {text}
